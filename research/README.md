@@ -1,11 +1,7 @@
-# TensorFlow Research Models
+## Model in fork
+-   [astronet] (astronet): neural networks for classifying transits of potential exoplanets
 
-This folder contains machine learning models implemented by researchers in
-[TensorFlow](https://tensorflow.org). The models are maintained by their
-respective authors. To propose a model for inclusion, please submit a pull
-request.
-
-## Models
+## Models not in fork
 
 -   [adversarial_crypto](adversarial_crypto): protecting communications with
     adversarial neural cryptography.
