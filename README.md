@@ -1,4 +1,4 @@
-# Author's notes: TensorFlow Models fork for building RNN variants of AstroNet
+## Note by OneAndOnlySeabass: TensorFlow Models fork for building RNN variants of AstroNet
 
 This repository was forked by me to build an RNN and GRU variant of AstroNet as part of my master thesis "Comparing convolutional neural networks and recurrent neural networks for exoplanet detection" for Data Science: Business and Governance at Tilburg University.
 
