@@ -4,6 +4,8 @@ This repository was forked by me to build an RNN and GRU variant of AstroNet as 
 
 All supplementary code is currently under construction and not usable in practice. Updates will be provided on this page.
 
+Link to original TensorFlow/models branch: https://github.com/tensorflow/models/tree/master/
+
 # TensorFlow Models
 
 This repository contains a number of different models implemented in [TensorFlow](https://www.tensorflow.org):
