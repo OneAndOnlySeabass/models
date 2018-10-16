@@ -9,6 +9,7 @@ read_loc = #r"tce csv location"
 pc_subset = 1000
 fp_subset = 1000 # Both AFPs and NTPs
 write_loc = #r"desired output csv location"
+my_seed = 114639
 
 # Reading the csv file from read_loc
 kepler_df = pd.read_csv(read_loc, index_col="rowid", comment="#")
@@ -21,7 +22,7 @@ PC_df = kepler_df[kepler_df.av_training_set == 'PC']
 FP_df = kepler_df[kepler_df.av_training_set != 'PC']
 
 # Random selection of 1000 PCs and 1000 NPs
-np.random.seed(114639)
+np.random.seed(my_seed)
 PC_random = PC_df.sample(n=pc_subset)
 FP_random = FP_df.sample(n=fp_subset)
 
