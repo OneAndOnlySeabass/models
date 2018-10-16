@@ -5,11 +5,10 @@ import pandas as pd
 import numpy as np
 
 # Adjustable variables can be changed here
-read_loc = r"C:\Users\Sebastiaan\Documents\Kepler data\q1_q17_dr24_tce.csv"
-n_subset = 1000 #   For each category (PC & FP). 
-#                   E.g. n=100 results in 200 entries total.
-
-write_loc = r"C:\Users\Sebastiaan\Documents\Kepler data\tce_subset.csv"
+read_loc = #r"tce csv location"
+pc_subset = 1000
+fp_subset = 1000 # Both AFPs and NTPs
+write_loc = #r"desired output csv location"
 
 # Reading the csv file from read_loc
 kepler_df = pd.read_csv(read_loc, index_col="rowid", comment="#")
@@ -23,8 +22,8 @@ FP_df = kepler_df[kepler_df.av_training_set != 'PC']
 
 # Random selection of 1000 PCs and 1000 NPs
 np.random.seed(114639)
-PC_random = PC_df.sample(n=n_subset)
-FP_random = FP_df.sample(n=n_subset)
+PC_random = PC_df.sample(n=pc_subset)
+FP_random = FP_df.sample(n=fp_subset)
 
 sample_df = pd.concat((PC_random, FP_random))
 sample_df = sample_df.sample(frac=1) # Shuffles the data
