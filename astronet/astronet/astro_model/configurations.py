@@ -55,8 +55,8 @@ def base():
           "output_dim": 1,
 
           # Fully connected layers before the logits layer.
-          "num_pre_logits_hidden_layers": 0,
-          "pre_logits_hidden_layer_size": 0,
+          "num_pre_logits_hidden_layers": 2,
+          "pre_logits_hidden_layer_size": 128,
           "pre_logits_dropout_rate": 0.0,
 
           # Number of examples per training batch.

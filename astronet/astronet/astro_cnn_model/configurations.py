@@ -70,7 +70,7 @@ def local_global():
   config["hparams"]["time_series_hidden"] = {
       "local_view": {
           "cnn_num_blocks": 2,
-          "cnn_block_size": 2,
+          "cnn_block_size": 1,
           "cnn_initial_num_filters": 16,
           "cnn_block_filter_factor": 2,
           "cnn_kernel_size": 5,
@@ -79,8 +79,8 @@ def local_global():
           "pool_strides": 2,
       },
       "global_view": {
-          "cnn_num_blocks": 5,
-          "cnn_block_size": 2,
+          "cnn_num_blocks": 3,
+          "cnn_block_size": 1,
           "cnn_initial_num_filters": 16,
           "cnn_block_filter_factor": 2,
           "cnn_kernel_size": 5,
@@ -89,6 +89,6 @@ def local_global():
           "pool_strides": 2,
       },
   }
-  config["hparams"]["num_pre_logits_hidden_layers"] = 4
-  config["hparams"]["pre_logits_hidden_layer_size"] = 512
+  config["hparams"]["num_pre_logits_hidden_layers"] = 2
+  config["hparams"]["pre_logits_hidden_layer_size"] = 128
   return config

@@ -73,14 +73,14 @@ def local_global():
   # Add configurations for the fully-connected layers of time series features.
   config["hparams"]["time_series_hidden"] = {
       "local_view": {
-          "num_local_layers": 0,
+          "num_local_layers": 2,
           "local_layer_size": 128,
           "translation_delta": 0,  # For wide convolution.
           "pooling_type": "max",  # For wide convolution.
           "dropout_rate": 0.0,
       },
       "global_view": {
-          "num_local_layers": 0,
+          "num_local_layers": 3,
           "local_layer_size": 128,
           "translation_delta": 0,  # For wide convolution.
           "pooling_type": "max",  # For wide convolution.
