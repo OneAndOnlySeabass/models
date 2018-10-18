@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Configurations for model building, training and evaluation.
+"""Configurations for astro_model building, training and evaluation.
 
 The default base configuration has one "global_view" time series feature per
 input example. Additional time series features and auxiliary features can be
