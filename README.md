@@ -4,7 +4,7 @@ This repository was forked to build an RNN and GRU variant of AstroNet, as well 
 
 All supplementary code for the RNNs and GRUs is currently under construction and not usable in practice. Updates will be provided on this page.
 
-Update 21-10-2018: The experiments with the FC and CNN models have been conducted. Performance data is stored under astronet/models and can be accessed using TensorBoard.
+Update 21-10-2018: The experiments with the FC and CNN models have been conducted. Performance data is available on request as I am unable to upload some large files to GitHub.
 
 Link to original TensorFlow/models branch: https://github.com/tensorflow/models/tree/master/
 
