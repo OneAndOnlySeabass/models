@@ -33,7 +33,7 @@ from astronet.astro_model import configurations as astro_configurations
 _MODELS = {
     "AstroModel": (astro_model.AstroModel, astro_configurations),
     "AstroFCModel": (astro_fc_model.AstroFCModel, astro_fc_configurations),
-    "AstroCNNModel": (astro_cnn_model.AstroCNNModel, astro_cnn_configurations),
+    "AstroCNNModel": (astro_cnn_model.AstroCNNModel, astro_cnn_configurations)#,
     #"AstroRNNModel": (astro_rnn_model.AstroRNNModel, astro_rnn_configurations),
     #"AstroGRUModel": (astro_gru_model.AstroGRUModel, astro_gru_configurations)
 }
