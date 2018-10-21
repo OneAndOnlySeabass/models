@@ -1,4 +1,5 @@
 # AstroNet: A Neural Network for Identifying Exoplanets in Light Curves
+The official readme for the AstroNet model by Chris Shallue.
 
 ![Transit Animation](docs/transit.gif)
 
