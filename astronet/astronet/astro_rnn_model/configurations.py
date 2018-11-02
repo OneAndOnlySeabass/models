@@ -13,6 +13,8 @@ Available configurations:
       - A "global" view of the entire orbital period.
       - A "local" zoomed-in view of the transit event.
 
+Note: The use of CuDNN layers is not set here but in astro_rnn_model.py
+      
 Code finished in draft. Not tested yet!
 """
 from __future__ import absolute_import
@@ -22,7 +24,7 @@ from __future__ import print_function
 from astronet.astro_model import configurations as parent_configs
 
 def base():
-  """Base configuration for a CNN model with a single global view."""
+  """Base configuration for an RNN model with a single global view."""
   config = parent_configs.base()
   
   # Add configuration for the recurrent layers of the global_view feature.
@@ -31,18 +33,17 @@ def base():
           "rnn_num_layers": 3,
           "rnn_num_units": 128,
           "rnn_memory_cells": None, # None for standard RNN or "lstm" or "gru"
-          "rnn_activation": "tanh" # "tanh" or "relu". ReLU not available for CuDNN LSTM/GRU.
-          "dropout": 0.0,
-          "bidirectional": False
+          "rnn_activation": "tanh", # "tanh" or "relu". ReLU not available for CuDNN LSTM/GRU.
+          "rnn_dropout": 0.0,
+          "rnn_direction": "uni" # "uni" or "bi"
       },
   }
   config["hparams"]["num_pre_logits_hidden_layers"] = 2
   config["hparams"]["pre_logits_hidden_layer_size"] = 128
-  config["hparams"]["use_cudnn_layers"] = True # Only set to True if GPU is present
   return config
   
 def local_global():
-  """Base configuration for a CNN model with separate local/global views."""
+  """Base configuration for an RNN model with separate local/global views."""
   config = parent_configs.base()
 
   # Override the model features to be local_view and global_view time series.
@@ -61,25 +62,21 @@ def local_global():
       "local_view": {
           "rnn_num_layers": 2,
           "rnn_num_units": 128,
-          "rnn_memory_cells": None, # None for standard RNN or "lstm" or "gru"
-          "rnn_activation": "tanh" # "tanh" or "relu". ReLU not available for CuDNN LSTM/GRU.
-          "dropout": 0.0,
-          "bidirectional": False
+          "rnn_memory_cells": "gru", # None for standard RNN or "lstm" or "gru"
+          "rnn_activation": "tanh", # "tanh" or "relu". ReLU not available for CuDNN LSTM/GRU.
+          "rnn_dropout": 0.0,
+          "rnn_direction": "uni" # "uni" or "bi"
       },
-  }
-  # Add configuration for the recurrent layers of the global_view feature.
-  config["hparams"]["time_series_hidden"] = {
       "global_view": {
           "rnn_num_layers": 3,
           "rnn_num_units": 128,
-          "rnn_memory_cells": None, # None for standard RNN or "lstm" or "gru"
-          "rnn_activation": "tanh" # "tanh" or "relu". ReLU not available for CuDNN LSTM/GRU.
-          "dropout": 0.0,
-          "bidirectional": False
+          "rnn_memory_cells": "gru", # None for standard RNN or "lstm" or "gru"
+          "rnn_activation": "tanh", # "tanh" or "relu". ReLU not available for CuDNN LSTM/GRU.
+          "rnn_dropout": 0.0,
+          "rnn_direction": "uni" # "uni" or "bi"
       },
   }
   config["hparams"]["num_pre_logits_hidden_layers"] = 2
   config["hparams"]["pre_logits_hidden_layer_size"] = 128
-  config["hparams"]["use_cudnn_layers"] = True # Only set to True if GPU is present
   return config
   
