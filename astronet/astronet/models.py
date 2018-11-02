@@ -24,15 +24,15 @@ from astronet.astro_fc_model import astro_fc_model
 from astronet.astro_fc_model import configurations as astro_fc_configurations
 from astronet.astro_model import astro_model
 from astronet.astro_model import configurations as astro_configurations
-# from astronet.astro_rnn_model import astro_model
-# from astronet.astro_rnn_model import configurations as astro_rnn_configurations
+from astronet.astro_rnn_model import astro_rnn_model
+from astronet.astro_rnn_model import configurations as astro_rnn_configurations
 
 # Dictionary of model name to (model_class, configuration_module).
 _MODELS = {
     "AstroModel": (astro_model.AstroModel, astro_configurations),
     "AstroFCModel": (astro_fc_model.AstroFCModel, astro_fc_configurations),
-    "AstroCNNModel": (astro_cnn_model.AstroCNNModel, astro_cnn_configurations)#,
-    #"AstroRNNModel": (astro_rnn_model.AstroRNNModel, astro_rnn_configurations)
+    "AstroCNNModel": (astro_cnn_model.AstroCNNModel, astro_cnn_configurations),
+    "AstroRNNModel": (astro_rnn_model.AstroRNNModel, astro_rnn_configurations)
 }
 
 

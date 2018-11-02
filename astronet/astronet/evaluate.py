@@ -22,6 +22,7 @@ import argparse
 import sys
 
 import tensorflow as tf
+import numpy as np
 
 from astronet import models
 from astronet.util import config_util
@@ -77,7 +78,12 @@ def main(_):
   # Create the estimator.
   estimator = estimator_util.create_estimator(
       model_class, config.hparams, model_dir=FLAGS.model_dir)
-
+  
+  # Print no. of trainable parameters to console.
+  var_names = [v for v in estimator.get_variable_names()]
+  n_params = np.sum([len(estimator.get_variable_value(v).flatten()) for v in var_names])
+  print("Trainable parameters in model:", int(n_params))
+  
   # Create an input function that reads the evaluation dataset.
   input_fn = estimator_util.create_input_fn(
       file_pattern=FLAGS.eval_files,

@@ -13,6 +13,8 @@ py_library(
         "//astronet/astro_fc_model:configurations",
         "//astronet/astro_model",
         "//astronet/astro_model:configurations",
+        "//astronet/astro_rnn_model",
+        "//astronet/astro_rnn_model:configurations",
         "//astronet/util:configdict",
     ],
 )
