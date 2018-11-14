@@ -62,10 +62,10 @@ class AstroRNNModelTest(tf.test.TestCase):
         "time_feature_1": {
         "rnn_num_layers": 2,
         "rnn_num_units": 16,
-        "rnn_memory_cells": "gru",
+        "rnn_memory_cells": "lstm",
         "rnn_activation": "tanh",
         "rnn_dropout": 0.0,
-        "rnn_direction": "uni"
+        "rnn_direction": "bi"
         }
     }
     config = configurations.base()
@@ -80,24 +80,6 @@ class AstroRNNModelTest(tf.test.TestCase):
                                           tf.estimator.ModeKeys.TRAIN)
     model.build()
     
-    # Validate Tensor shapes.
-    #if config["hparams"]["use_cudnn_layers"] == True:
-    #    rnn1_layers =  testing.get_variable_by_name(
-    #        "time_feature_1_hidden/rnn/weights")
-    #    self.assertShapeEquals((20,16), rnn1_layers)
-    #elif hparams.use_cudnn_layers == False:
-    #    raise Error("Support for non-CuDNN layers not implemented yet.")
-    #else:
-    #    raise ValueError("Hyperparameter use_cudnn_layers is not a boolean.")
-    #    
-    #self.assertItemsEqual(["time_feature_1"],
-    #                      model.time_series_hidden_layers.keys())
-    #self.assertShapeEquals((None, 16),
-    #                       model.time_series_hidden_layers["time_feature_1"])
-    #self.assertEqual(len(model.aux_hidden_layers), 0)
-    #self.assertIs(model.time_series_hidden_layers["time_feature_1"],
-    #             model.pre_logits_concat)
-                  
     # Execute the TensorFlow graph.
     scaffold = tf.train.Scaffold()
     scaffold.finalize()
@@ -133,18 +115,18 @@ class AstroRNNModelTest(tf.test.TestCase):
         "time_feature_1": {
             "rnn_num_layers": 2,
             "rnn_num_units": 16,
-            "rnn_memory_cells": "gru",
+            "rnn_memory_cells": "lstm",
             "rnn_activation": "tanh",
             "rnn_dropout": 0.0,
-            "rnn_direction": "uni"
+            "rnn_direction": "bi"
         },
         "time_feature_2": {
             "rnn_num_layers": 1,
             "rnn_num_units": 4,
-            "rnn_memory_cells": "gru",
+            "rnn_memory_cells": "lstm",
             "rnn_activation": "tanh",
             "rnn_dropout": 0.0,
-            "rnn_direction": "uni"
+            "rnn_direction": "bi"
         }
     }
     config = configurations.base()
@@ -158,30 +140,6 @@ class AstroRNNModelTest(tf.test.TestCase):
     model = astro_rnn_model.AstroRNNModel(features, labels, config.hparams,
                                           tf.estimator.ModeKeys.TRAIN)
     model.build()
-    
-    # Validate Tensor shapes.
-    #if config["hparams"]["use_cudnn_layers"] == True:
-    #    rnn1_layers =  testing.get_variable_by_name(
-    #        "time_feature_1_hidden/rnn/weights")
-    #    self.assertShapeEquals((20,16), rnn1_layers)
-    #    rnn2_layers =  testing.get_variable_by_name(
-    #        "time_feature_2_hidden/rnn/weights")
-    #    self.assertShapeEquals((5,4), rnn2_layers)
-    #elif hparams.use_cudnn_layers == False:
-    #    raise Error("Support for non-CuDNN layers not implemented yet.")
-    #else:
-    #    raise ValueError("Hyperparameter use_cudnn_layers is not a boolean.")
-    
-    #self.assertItemsEqual(["time_feature_1", "time_feature_2"],
-    #                      model.time_series_hidden_layers.keys())
-    #self.assertShapeEquals((None, 16),
-    #                       model.time_series_hidden_layers["time_feature_1"])
-    #self.assertShapeEquals((None, 4),
-    #                       model.time_series_hidden_layers["time_feature_2"])
-    #self.assertItemsEqual(["aux_feature_1"], model.aux_hidden_layers.keys())
-    #self.assertIs(model.aux_features["aux_feature_1"],
-    #              model.aux_hidden_layers["aux_feature_1"])
-    #self.assertShapeEquals((None, 28), model.pre_logits_concat)
     
     # Execute the TensorFlow graph.
     scaffold = tf.train.Scaffold()

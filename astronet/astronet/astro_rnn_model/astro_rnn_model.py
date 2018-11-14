@@ -79,15 +79,15 @@ class AstroRNNModel(astro_model.AstroModel):
             scope: Name of the variable scope.
 
         Returns:
-            A Tensor of shape [batch_size, output_size]
+            A Tensor of shape [batch_size, output_size].
         
-        Author's note:
+        Author's note on functioning of code:
             At the time of writing this code, the CuDNN GRU layers are not 
             working yet. This is an open TensorFlow issue. 
             GitHub link: https://github.com/tensorflow/tensorflow/issues/20972
         """
-        # Set use of CuDNN layers below. 
-        use_cudnn_layers = False
+        # Set use of CuDNN layers below. Note that GRUCuDNN layers currently do not work with this model.
+        use_cudnn_layers = True
         
         with tf.variable_scope(scope):
             if use_cudnn_layers == True:
@@ -110,12 +110,8 @@ class AstroRNNModel(astro_model.AstroModel):
                 output_dim = net_shape[1] * net_shape[2]
                 net = tf.reshape(net[0], [-1, output_dim], name="flatten")
                 
-            elif use_cudnn_layers == False: # Needs to be tested
+            elif use_cudnn_layers == False:
                 net = tf.expand_dims(inputs, -1) # [batch, length, cell_state_size]
-                #net_shape = net.get_shape().as_list()
-                #net = tf.reshape(net, (net_shape[0], net_shape[1], 
-                #    hparams.rnn_num_units))
-                
                 rnn = rnn_layer_builder.build_general_layers(
                     hparams.rnn_num_layers,
                     hparams.rnn_num_units,
@@ -125,18 +121,20 @@ class AstroRNNModel(astro_model.AstroModel):
                     scope
                     )                    
                 if hparams.rnn_direction == "uni":
-                    #initial_state = rnn.zero_state(batch_size, dtype=tf.float32)
                     net, output_state = tf.nn.dynamic_rnn(
                         cell=rnn, 
                         inputs=net,
                         dtype=tf.float32, 
                         scope=scope)     
                 elif hparams.rnn_direction == "bi":
-                    net, os_fw, os_bw = tf.contrib.rnn.stack_bidirectional_dynamic_rnn(
-                        cells_fw=rnn,
-                        cells_bw=rnn,
-                        inputs=net,
-                        scope=scope)
+                    raise NotImplementedError("Non-CuDNN")
+                    # Commented this part as the code does not work in its current form
+                    #net, output_states = tf.nn.bidirectional_dynamic_rnn(
+                    #    cell_fw=rnn,
+                    #    cell_bw=rnn,
+                    #    inputs=net,
+                    #    dtype=tf.float32,
+                    #    scope=scope)
                 else:
                     raise Error("Unrecognized rnn_direction. Use 'uni' or 'bi'.")
                     
@@ -144,10 +142,11 @@ class AstroRNNModel(astro_model.AstroModel):
                 net.get_shape().assert_has_rank(3)
                 net_shape = net.get_shape().as_list()
                 output_dim = net_shape[1] * net_shape[2]
-                net = tf.reshape(net, [-1, output_dim], name="flatten")                
+                net = tf.reshape(net, [-1, output_dim], name="flatten")                 
                 
             else:
-                raise ValueError("Hyperparameter use_cudnn_layers is not a boolean.")
+                raise ValueError("Hyperparameter use_cudnn_layers and/or use_MultiRNNCell \
+                    is not a boolean.")
         return net
         
     def build_time_series_hidden_layers(self):

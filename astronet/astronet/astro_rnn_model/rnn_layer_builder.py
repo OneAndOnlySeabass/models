@@ -13,18 +13,19 @@ import tensorflow as tf
 
 def build_general_layers(layers, units, activation, memory_cell, dropout, name):
     """ 
-    Builds layers not optimized for CuDNN if hparams.use_cudnn_layers is False.
+    Builds layers not optimized for CuDNN if use_cudnn_layers is False
+    and use_MultiRNNCell is True in astro_rnn_model.py.
         
     Args:
+        layers: Number of layers to create
         units: number of units in the layer
         activation: Activation function to use.
         memory_cell: Indicate type of memory cell to use. Use None for basic
         RNN, or use "lstm" or "gru".
-        direction: Unidirectional or bidirectional from hparams.rnn_bidirectional
-        name: Name of the layer
+        dropout: Amount of dropout to apply to each layer. Use 0.0 for no dropout.
+        name: Name to give to each layer.
     Returns:
-        A general layer according to given args.
-    Code under construction.   
+        A MultiRNNCell according to given args.  
     """
     if memory_cell is None:
         cells = []
@@ -32,28 +33,32 @@ def build_general_layers(layers, units, activation, memory_cell, dropout, name):
             cell = tf.contrib.rnn.BasicRNNCell(
                 units, 
                 activation=activation,
-                name=(name+str(n)))
+                name=(name+str(n))
+                )
             if dropout > 0.0:
                 keep = 1 - dropout
                 cell = tf.contrib.rnn.DropoutWrapper(cell,
                     input_keep_prob=keep,
                     output_keep_prob=keep,
-                    state_keep_prob=keep)                
+                    state_keep_prob=keep
+                    )                
             cells.append(cell)
         
     elif memory_cell == "lstm":
         cells = []
         for n in range(layers):       
-            cell = tf.contrib.rnn.BasicLSTMCell(
+            cell = tf.nn.rnn_cell.LSTMCell(
                 units, 
                 activation=activation,
-                name=(name+str(n)))
+                name=(name+str(n))
+                )
             if dropout > 0.0:
                 keep = 1 - dropout
                 cell = tf.contrib.rnn.DropoutWrapper(cell,
                     input_keep_prob=keep,
                     output_keep_prob=keep,
-                    state_keep_prob=keep)
+                    state_keep_prob=keep
+                    )
             cells.append(cell)
             
     elif memory_cell == "gru":
@@ -62,13 +67,15 @@ def build_general_layers(layers, units, activation, memory_cell, dropout, name):
             cell = tf.contrib.rnn.GRUCell(
                 units, 
                 activation=activation,
-                name=(name+str(n)))
+                name=(name+str(n))
+                )
             if dropout > 0.0:
                 keep = 1 - dropout
                 cell = tf.contrib.rnn.DropoutWrapper(cell,
                     input_keep_prob=keep,
                     output_keep_prob=keep,
-                    state_keep_prob=keep)
+                    state_keep_prob=keep
+                    )
             cells.append(cell)
     else:
         raise Error("Invalid memory_cell type. Allowed: None, 'lstm' or 'gru'.")
@@ -88,14 +95,16 @@ def build_cudnn_layers(layers, units, activation, memory_cell, direction, dropou
         memory_cell: Indicate type of memory cell to use. Use None for basic
         RNN, or use "lstm" or "gru".
         direction: Unidirectional or bidirectional.
-        dropout: The amount of dropout to apply to the model.
+        dropout: The amount of dropout to apply to the model. Use 0.0 for no dropout.
         name: The name of the model
     Returns:
         A collection of CuDNN optimized layers according to given args.  
     """
-    assert memory_cell != "gru", ("GRUs cannot be used in CuDNN layers right now. \
+    # The assert statement below can be removed if the issue around CuDNNGRU is resolved
+    assert memory_cell != "gru", ("GRUs cannot be used in CuDNN layers right now, see documentation. \
                                     Use the non-CuDNN implementation or use LSTM.")
-    if activation == "relu" and memory_cell == "lstm":
+    
+    if activation == "relu" and memory_cell in ["lstm", "gru"]:
         raise Error("ReLu activation cannot be used in combination \
                     with LSTM.")
         
@@ -195,4 +204,3 @@ def build_cudnn_layers(layers, units, activation, memory_cell, direction, dropou
     else:
         raise Error("Unrecognized memory cell. Use None or 'lstm'")
     return cudnn_net
-    
