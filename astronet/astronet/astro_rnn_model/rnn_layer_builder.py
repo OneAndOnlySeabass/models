@@ -11,7 +11,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 
-def build_general_layers(layers, units, activation, memory_cell, dropout, name):
+def build_general_layers(layers, units, activation, memory_cell, dropout, direction, name):
     """ 
     Builds layers not optimized for CuDNN if use_cudnn_layers is False
     and use_MultiRNNCell is True in astro_rnn_model.py.
@@ -23,9 +23,11 @@ def build_general_layers(layers, units, activation, memory_cell, dropout, name):
         memory_cell: Indicate type of memory cell to use. Use None for basic
         RNN, or use "lstm" or "gru".
         dropout: Amount of dropout to apply to each layer. Use 0.0 for no dropout.
+        direction: "uni" for unidirectional and "bi" for bidirectional. 
         name: Name to give to each layer.
     Returns:
-        A MultiRNNCell according to given args.  
+        A MultiRNNCell according to given args for unidirectional networks and
+        a list of individual RNN cells for bidirectional networks.  
     """
     if memory_cell is None:
         cells = []
@@ -80,9 +82,10 @@ def build_general_layers(layers, units, activation, memory_cell, dropout, name):
     else:
         raise Error("Invalid memory_cell type. Allowed: None, 'lstm' or 'gru'.")
     
-    rnn_net = tf.contrib.rnn.MultiRNNCell(cells)
+    if direction == "uni":
+        cells = tf.contrib.rnn.MultiRNNCell(cells)
     
-    return rnn_net
+    return cells
     
 def build_cudnn_layers(layers, units, activation, memory_cell, direction, dropout, name):
     """ 

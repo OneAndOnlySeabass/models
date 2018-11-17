@@ -87,7 +87,7 @@ class AstroRNNModel(astro_model.AstroModel):
             GitHub link: https://github.com/tensorflow/tensorflow/issues/20972
         """
         # Set use of CuDNN layers below. Note that GRUCuDNN layers currently do not work with this model.
-        use_cudnn_layers = True
+        use_cudnn_layers = False
         
         with tf.variable_scope(scope):
             if use_cudnn_layers == True:
@@ -118,6 +118,7 @@ class AstroRNNModel(astro_model.AstroModel):
                     hparams.rnn_activation,
                     hparams.rnn_memory_cells,
                     hparams.rnn_dropout,
+                    hparams.rnn_direction,
                     scope
                     )                    
                 if hparams.rnn_direction == "uni":
@@ -127,14 +128,13 @@ class AstroRNNModel(astro_model.AstroModel):
                         dtype=tf.float32, 
                         scope=scope)     
                 elif hparams.rnn_direction == "bi":
-                    raise NotImplementedError("Non-CuDNN")
-                    # Commented this part as the code does not work in its current form
-                    #net, output_states = tf.nn.bidirectional_dynamic_rnn(
-                    #    cell_fw=rnn,
-                    #    cell_bw=rnn,
-                    #    inputs=net,
-                    #    dtype=tf.float32,
-                    #    scope=scope)
+                    net, os_fw, os_bw = tf.contrib.rnn.stack_bidirectional_dynamic_rnn(
+                        cells_fw=rnn,
+                        cells_bw=rnn,
+                        inputs=net,
+                        dtype=tf.float32,
+                        scope=scope)
+
                 else:
                     raise Error("Unrecognized rnn_direction. Use 'uni' or 'bi'.")
                     
