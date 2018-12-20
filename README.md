@@ -21,7 +21,7 @@ The original AstroNet source code has been used and modified in my project for s
 
 [Apache License 2.0](LICENSE)
 
-Link to original TensorFlow/models branch: https://github.com/tensorflow/models/tree/master/
+Link to original AstroNet source code: https://github.com/google-research/exoplanet-ml 
 
 ## Contact
 If you would like to contact me regarding my project, you can e-mail me at (first name).(last name) AT hetnet.nl
