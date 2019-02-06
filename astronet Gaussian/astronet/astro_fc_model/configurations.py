@@ -29,29 +29,31 @@ from astronet.astro_model import configurations as parent_configs
 
 
 def base():
-  """Base configuration for a CNN model with a single global view."""
+  """Base config for a fully connected model with a single global view."""
   config = parent_configs.base()
 
-  # Add configuration for the convolutional layers of the global_view feature.
+  # Add configuration for the fully-connected layers of the global_view feature.
   config["hparams"]["time_series_hidden"] = {
       "global_view": {
-          "cnn_num_blocks": 5,
-          "cnn_block_size": 2,
-          "cnn_initial_num_filters": 16,
-          "cnn_block_filter_factor": 2,
-          "cnn_kernel_size": 5,
-          "convolution_padding": "same",
-          "pool_size": 5,
-          "pool_strides": 2,
+          "num_local_layers": 0,
+          "local_layer_size": 128,
+
+          # If > 0, the first layer is implemented as a wide convolutional layer
+          # for invariance to small translations.
+          "translation_delta": 0,
+
+          # Pooling type following the wide convolutional layer.
+          "pooling_type": "max",
+
+          # Dropout rate for the fully connected layers.
+          "dropout_rate": 0.0,
       },
   }
-  config["hparams"]["num_pre_logits_hidden_layers"] = 4
-  config["hparams"]["pre_logits_hidden_layer_size"] = 1024
   return config
 
 
 def local_global():
-  """Base configuration for a CNN model with separate local/global views."""
+  """Base config for a locally fully connected model with local/global views."""
   config = parent_configs.base()
 
   # Override the model features to be local_view and global_view time series.
@@ -62,33 +64,27 @@ def local_global():
       },
       "global_view": {
           "length": 2001,
+          "name_in_proto": "light_curve",
           "is_time_series": True,
+          "data_source": "",
       },
   }
 
-  # Add configurations for the convolutional layers of time series features.
+  # Add configurations for the fully-connected layers of time series features.
   config["hparams"]["time_series_hidden"] = {
       "local_view": {
-          "cnn_num_blocks": 2,
-          "cnn_block_size": 2,
-          "cnn_initial_num_filters": 16,
-          "cnn_block_filter_factor": 2,
-          "cnn_kernel_size": 5,
-          "convolution_padding": "same",
-          "pool_size": 7,
-          "pool_strides": 2,
+          "num_local_layers": 0,
+          "local_layer_size": 128,
+          "translation_delta": 0,  # For wide convolution.
+          "pooling_type": "max",  # For wide convolution.
+          "dropout_rate": 0.0,
       },
       "global_view": {
-          "cnn_num_blocks": 5,
-          "cnn_block_size": 2,
-          "cnn_initial_num_filters": 16,
-          "cnn_block_filter_factor": 2,
-          "cnn_kernel_size": 5,
-          "convolution_padding": "same",
-          "pool_size": 5,
-          "pool_strides": 2,
+          "num_local_layers": 0,
+          "local_layer_size": 128,
+          "translation_delta": 0,  # For wide convolution.
+          "pooling_type": "max",  # For wide convolution.
+          "dropout_rate": 0.0,
       },
   }
-  config["hparams"]["num_pre_logits_hidden_layers"] = 4
-  config["hparams"]["pre_logits_hidden_layer_size"] = 512
   return config

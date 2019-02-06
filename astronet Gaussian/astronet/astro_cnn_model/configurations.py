@@ -51,24 +51,22 @@ def base():
 
 
 def local_global():
-  """Base configuration for a CNN model with separate local/global views."""
+  """Base configuration for a CNN model with separate local/global views. 
+     In this setup, the configuration is altered to support one single global 
+     view, generated via application of a Gaussian pyramid."""
   config = parent_configs.base()
 
-  # Override the model features to be local_view and global_view time series.
+  # Override the model features to be global_view time series.
   config["inputs"]["features"] = {
-      "local_view": {
-          "length": 201,
-          "is_time_series": True,
-      },
       "global_view": {
-          "length": 2001,
+          "length": 251,
           "is_time_series": True,
       },
   }
 
   # Add configurations for the convolutional layers of time series features.
   config["hparams"]["time_series_hidden"] = {
-      "local_view": {
+      "global_view": {
           "cnn_num_blocks": 2,
           "cnn_block_size": 2,
           "cnn_initial_num_filters": 16,
@@ -76,16 +74,6 @@ def local_global():
           "cnn_kernel_size": 5,
           "convolution_padding": "same",
           "pool_size": 7,
-          "pool_strides": 2,
-      },
-      "global_view": {
-          "cnn_num_blocks": 5,
-          "cnn_block_size": 2,
-          "cnn_initial_num_filters": 16,
-          "cnn_block_filter_factor": 2,
-          "cnn_kernel_size": 5,
-          "convolution_padding": "same",
-          "pool_size": 5,
           "pool_strides": 2,
       },
   }

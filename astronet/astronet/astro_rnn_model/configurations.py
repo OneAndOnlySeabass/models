@@ -62,17 +62,17 @@ def local_global():
       "local_view": {
           "rnn_num_layers": 2,
           "rnn_num_units": 128,
-          "rnn_memory_cells": "gru", # None for standard RNN or "lstm" or "gru"
+          "rnn_memory_cells": "lstm", # None for standard RNN or "lstm" or "gru"
           "rnn_activation": "tanh", # "tanh" or "relu". ReLU not available for CuDNN LSTM/GRU.
-          "rnn_dropout": 0.0,
+          "rnn_dropout": 0.3,
           "rnn_direction": "uni" # "uni" or "bi"
       },
       "global_view": {
           "rnn_num_layers": 3,
           "rnn_num_units": 128,
-          "rnn_memory_cells": "gru", # None for standard RNN or "lstm" or "gru"
+          "rnn_memory_cells": "lstm", # None for standard RNN or "lstm" or "gru"
           "rnn_activation": "tanh", # "tanh" or "relu". ReLU not available for CuDNN LSTM/GRU.
-          "rnn_dropout": 0.0,
+          "rnn_dropout": 0.3,
           "rnn_direction": "uni" # "uni" or "bi"
       },
   }

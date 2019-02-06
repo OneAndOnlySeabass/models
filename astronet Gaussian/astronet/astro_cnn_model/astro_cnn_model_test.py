@@ -1,6 +1,3 @@
-# Code written by Sebastiaan Koning (OneAndOnlySeabass), 
-# using parts of the TensorFlow AstroNet source code under the Apache License 2.0.
-#
 # Copyright 2018 The TensorFlow Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Tests for astro_rnn_model.AstroRNNModel.
-Code finished in concept.
-"""
+"""Tests for astro_cnn_model.AstroCNNModel."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -27,14 +21,15 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
-from astronet.astro_rnn_model import astro_rnn_model
-from astronet.astro_rnn_model import configurations
+from astronet.astro_cnn_model import astro_cnn_model
+from astronet.astro_cnn_model import configurations
 from astronet.ops import input_ops
 from astronet.ops import testing
 from astronet.util import configdict
 
-class AstroRNNModelTest(tf.test.TestCase):
-  
+
+class AstroCNNModelTest(tf.test.TestCase):
+
   def assertShapeEquals(self, shape, tensor_or_array):
     """Asserts that a Tensor or Numpy array has the expected shape.
 
@@ -49,7 +44,7 @@ class AstroRNNModelTest(tf.test.TestCase):
       self.assertAllEqual(shape, tensor_or_array.shape.as_list())
     else:
       raise TypeError("tensor_or_array must be a Tensor or Numpy ndarray")
-  
+
   def testOneTimeSeriesFeature(self):
     # Build config.
     feature_spec = {
@@ -60,26 +55,53 @@ class AstroRNNModelTest(tf.test.TestCase):
     }
     hidden_spec = {
         "time_feature_1": {
-        "rnn_num_layers": 2,
-        "rnn_num_units": 16,
-        "rnn_memory_cells": "lstm",
-        "rnn_activation": "tanh",
-        "rnn_dropout": 0.0,
-        "rnn_direction": "uni"
+            "cnn_num_blocks": 2,
+            "cnn_block_size": 2,
+            "cnn_initial_num_filters": 4,
+            "cnn_block_filter_factor": 1.5,
+            "cnn_kernel_size": 3,
+            "convolution_padding": "same",
+            "pool_size": 2,
+            "pool_strides": 2,
         }
     }
     config = configurations.base()
     config["inputs"]["features"] = feature_spec
     config["hparams"]["time_series_hidden"] = hidden_spec
     config = configdict.ConfigDict(config)
-    
+
     # Build model.
     features = input_ops.build_feature_placeholders(config.inputs.features)
     labels = input_ops.build_labels_placeholder()
-    model = astro_rnn_model.AstroRNNModel(features, labels, config.hparams,
+    model = astro_cnn_model.AstroCNNModel(features, labels, config.hparams,
                                           tf.estimator.ModeKeys.TRAIN)
     model.build()
-    
+
+    # Validate Tensor shapes.
+    block_1_conv_1 = testing.get_variable_by_name(
+        "time_feature_1_hidden/block_1/conv_1/kernel")
+    self.assertShapeEquals((3, 1, 4), block_1_conv_1)
+
+    block_1_conv_2 = testing.get_variable_by_name(
+        "time_feature_1_hidden/block_1/conv_2/kernel")
+    self.assertShapeEquals((3, 4, 4), block_1_conv_2)
+
+    block_2_conv_1 = testing.get_variable_by_name(
+        "time_feature_1_hidden/block_2/conv_1/kernel")
+    self.assertShapeEquals((3, 4, 6), block_2_conv_1)
+
+    block_2_conv_2 = testing.get_variable_by_name(
+        "time_feature_1_hidden/block_2/conv_2/kernel")
+    self.assertShapeEquals((3, 6, 6), block_2_conv_2)
+
+    self.assertItemsEqual(["time_feature_1"],
+                          model.time_series_hidden_layers.keys())
+    self.assertShapeEquals((None, 30),
+                           model.time_series_hidden_layers["time_feature_1"])
+    self.assertEqual(len(model.aux_hidden_layers), 0)
+    self.assertIs(model.time_series_hidden_layers["time_feature_1"],
+                  model.pre_logits_concat)
+
     # Execute the TensorFlow graph.
     scaffold = tf.train.Scaffold()
     scaffold.finalize()
@@ -94,7 +116,7 @@ class AstroRNNModelTest(tf.test.TestCase):
       feed_dict = input_ops.prepare_feed_dict(model, features, labels)
       predictions = sess.run(model.predictions, feed_dict=feed_dict)
       self.assertShapeEquals((16, 1), predictions)
-    
+
   def testTwoTimeSeriesFeatures(self):
     # Build config.
     feature_spec = {
@@ -113,34 +135,70 @@ class AstroRNNModelTest(tf.test.TestCase):
     }
     hidden_spec = {
         "time_feature_1": {
-            "rnn_num_layers": 2,
-            "rnn_num_units": 16,
-            "rnn_memory_cells": "lstm",
-            "rnn_activation": "tanh",
-            "rnn_dropout": 0.0,
-            "rnn_direction": "bi"
+            "cnn_num_blocks": 2,
+            "cnn_block_size": 2,
+            "cnn_initial_num_filters": 4,
+            "cnn_block_filter_factor": 1.5,
+            "cnn_kernel_size": 3,
+            "convolution_padding": "same",
+            "pool_size": 2,
+            "pool_strides": 2,
         },
         "time_feature_2": {
-            "rnn_num_layers": 1,
-            "rnn_num_units": 4,
-            "rnn_memory_cells": "lstm",
-            "rnn_activation": "tanh",
-            "rnn_dropout": 0.0,
-            "rnn_direction": "bi"
+            "cnn_num_blocks": 1,
+            "cnn_block_size": 1,
+            "cnn_initial_num_filters": 5,
+            "cnn_block_filter_factor": 1,
+            "cnn_kernel_size": 2,
+            "convolution_padding": "same",
+            "pool_size": 0,
+            "pool_strides": 0,
         }
     }
     config = configurations.base()
     config["inputs"]["features"] = feature_spec
     config["hparams"]["time_series_hidden"] = hidden_spec
     config = configdict.ConfigDict(config)
-    
-    # Build model
+
+    # Build model.
     features = input_ops.build_feature_placeholders(config.inputs.features)
     labels = input_ops.build_labels_placeholder()
-    model = astro_rnn_model.AstroRNNModel(features, labels, config.hparams,
+    model = astro_cnn_model.AstroCNNModel(features, labels, config.hparams,
                                           tf.estimator.ModeKeys.TRAIN)
     model.build()
-    
+
+    # Validate Tensor shapes.
+    feature_1_block_1_conv_1 = testing.get_variable_by_name(
+        "time_feature_1_hidden/block_1/conv_1/kernel")
+    self.assertShapeEquals((3, 1, 4), feature_1_block_1_conv_1)
+
+    feature_1_block_1_conv_2 = testing.get_variable_by_name(
+        "time_feature_1_hidden/block_1/conv_2/kernel")
+    self.assertShapeEquals((3, 4, 4), feature_1_block_1_conv_2)
+
+    feature_1_block_2_conv_1 = testing.get_variable_by_name(
+        "time_feature_1_hidden/block_2/conv_1/kernel")
+    self.assertShapeEquals((3, 4, 6), feature_1_block_2_conv_1)
+
+    feature_1_block_2_conv_2 = testing.get_variable_by_name(
+        "time_feature_1_hidden/block_2/conv_2/kernel")
+    self.assertShapeEquals((3, 6, 6), feature_1_block_2_conv_2)
+
+    feature_2_block_1_conv_1 = testing.get_variable_by_name(
+        "time_feature_2_hidden/block_1/conv_1/kernel")
+    self.assertShapeEquals((2, 1, 5), feature_2_block_1_conv_1)
+
+    self.assertItemsEqual(["time_feature_1", "time_feature_2"],
+                          model.time_series_hidden_layers.keys())
+    self.assertShapeEquals((None, 30),
+                           model.time_series_hidden_layers["time_feature_1"])
+    self.assertShapeEquals((None, 25),
+                           model.time_series_hidden_layers["time_feature_2"])
+    self.assertItemsEqual(["aux_feature_1"], model.aux_hidden_layers.keys())
+    self.assertIs(model.aux_features["aux_feature_1"],
+                  model.aux_hidden_layers["aux_feature_1"])
+    self.assertShapeEquals((None, 56), model.pre_logits_concat)
+
     # Execute the TensorFlow graph.
     scaffold = tf.train.Scaffold()
     scaffold.finalize()
@@ -156,6 +214,6 @@ class AstroRNNModelTest(tf.test.TestCase):
       predictions = sess.run(model.predictions, feed_dict=feed_dict)
       self.assertShapeEquals((16, 1), predictions)
 
-    
+
 if __name__ == "__main__":
   tf.test.main()
