@@ -1,7 +1,7 @@
-# TensorFlow Models fork for building RNN variants of AstroNet
+# TensorFlow models fork for building RNN variants of AstroNet
 A project by Sebastiaan Koning (OneAndOnlySeabass)
 
-This repository was forked to build RNN, LSTM and GRU variants of AstroNet, as well as re-use the AstroNet FC and CNN code for experiments. These experiments were conducted as part of my master thesis "Comparing convolutional neural networks and recurrent neural networks for exoplanet detection" for Data Science: Business and Governance at Tilburg University. Once my thesis is finalized, I will add it to this repository. This repository will remain a permanent fork as I keep only the AstroNet model here and not any of the other models.
+This repository was forked to build RNN, LSTM and GRU variants of AstroNet, as well as re-use the AstroNet FC and CNN code for experiments. These experiments were conducted as part of my master thesis "Comparing convolutional neural networks and recurrent neural networks for exoplanet detection" for Data Science: Business and Governance at Tilburg University. This repository will remain a permanent fork as I keep only the AstroNet model here and not any of the other models.
 
 The added RNN model has received a dedicated directory within the astronet directory and works in largely the same way as the other AstroNet model types. All configurations can be set in the configurations.py file, except for the use of CuDNN RNNs, which is set in astro_rnn_model.py under the function "build_rnn_layers". Most model setups have been successfully tested, with the notable exception of a CuDNN GRU, which does not work with the Estimator class model generated in AstroNet due to an unresolved issue in the TensorFlow source code. You can follow this issue here: https://github.com/tensorflow/tensorflow/issues/20972 
 
